@@ -116,6 +116,44 @@ func (b *SecretBuilder) Build(c *fi.ModelBuilderContext) error {
 		c.AddTask(t)
 	}
 
+	if b.Cluster.Spec.KubeAPIServer.ProxyClientKeyFile != nil {
+		cert, err := b.KeyStore.Cert("kube-proxy-client")
+		if err != nil {
+			return err
+		}
+
+		serialized, err := cert.AsString()
+		if err != nil {
+			return err
+		}
+
+		t := &nodetasks.File{
+			Path:     *b.Cluster.Spec.KubeAPIServer.ProxyClientCertFile,
+			Contents: fi.NewStringResource(serialized),
+			Type:     nodetasks.FileType_File,
+		}
+		c.AddTask(t)
+	}
+
+	if b.Cluster.Spec.KubeAPIServer.ProxyClientKeyFile != nil {
+		k, err := b.KeyStore.PrivateKey("kube-proxy-client")
+		if err != nil {
+			return err
+		}
+
+		serialized, err := k.AsString()
+		if err != nil {
+			return err
+		}
+
+		t := &nodetasks.File{
+			Path:     *b.Cluster.Spec.KubeAPIServer.ProxyClientKeyFile,
+			Contents: fi.NewStringResource(serialized),
+			Type:     nodetasks.FileType_File,
+		}
+		c.AddTask(t)
+	}
+
 	if b.SecretStore != nil {
 		key := "kube"
 		token, err := b.SecretStore.FindSecret(key)

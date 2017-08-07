@@ -120,6 +120,16 @@ func (b *PKIModelBuilder) Build(c *fi.ModelBuilderContext) error {
 		c.AddTask(t)
 	}
 
+	if b.Cluster.Spec.KubeAPIServer.ProxyClientCertFile != nil && b.Cluster.Spec.KubeAPIServer.ProxyClientKeyFile != nil {
+		t := &fitasks.Keypair{
+			Name:      fi.String("kube-proxy-client"),
+			Lifecycle: b.Lifecycle,
+			Subject:   "cn=kube-proxy-client",
+			Type:      "client",
+		}
+		c.AddTask(t)
+	}
+
 	{
 		t := &fitasks.Keypair{
 			Name:      fi.String("kops"),
