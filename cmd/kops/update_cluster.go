@@ -65,6 +65,7 @@ type UpdateClusterOptions struct {
 	SSHPublicKey    string
 	MaxTaskDuration time.Duration
 	CreateKubecfg   bool
+	NodeUpSource    string
 
 	Phase string
 }
@@ -110,6 +111,7 @@ func NewCmdUpdateCluster(f *util.Factory, out io.Writer) *cobra.Command {
 	cmd.Flags().StringVar(&options.OutDir, "out", options.OutDir, "Path to write any local output")
 	cmd.Flags().BoolVar(&options.CreateKubecfg, "create-kube-config", options.CreateKubecfg, "Will control automatically creating the kube config file on your local filesystem")
 	cmd.Flags().StringVar(&options.Phase, "phase", options.Phase, "Subset of tasks to run")
+	cmd.Flags().StringVar(&options.NodeUpSource, "node-up-source", options.NodeUpSource, "Set URL of nodeup binary")
 	return cmd
 }
 
@@ -210,6 +212,7 @@ func RunUpdateCluster(f *util.Factory, clusterName string, out io.Writer, c *Upd
 		MaxTaskDuration: c.MaxTaskDuration,
 		InstanceGroups:  instanceGroups,
 		Phase:           phase,
+		NodeUpSource:    c.NodeUpSource,
 	}
 
 	err = applyCmd.Run()
